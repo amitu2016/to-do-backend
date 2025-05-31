@@ -52,11 +52,17 @@ public class AuthController {
                 .body(Map.of("message", "Invalid username or password"));
         }
 
-        final UserDetails userDetails = userDetailsService
-            .loadUserByUsername(loginRequest.get("username"));
+        final String username = loginRequest.get("username");
+        final User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         final String jwt = jwtUtil.generateToken(userDetails);
 
-        return ResponseEntity.ok(Map.of("token", jwt));
+        return ResponseEntity.ok(Map.of(
+            "token", jwt,
+            "id", user.getId(),
+            "username", user.getUsername()
+        ));
     }
 
     @PostMapping("/register")
@@ -71,12 +77,16 @@ public class AuthController {
             passwordEncoder.encode(registerRequest.get("password"))
         );
 
-        userRepository.save(user);
+        user = userRepository.save(user);
 
         final UserDetails userDetails = userDetailsService
             .loadUserByUsername(registerRequest.get("username"));
         final String jwt = jwtUtil.generateToken(userDetails);
 
-        return ResponseEntity.ok(Map.of("token", jwt));
+        return ResponseEntity.ok(Map.of(
+            "token", jwt,
+            "id", user.getId(),
+            "username", user.getUsername()
+        ));
     }
 } 

@@ -2,11 +2,13 @@ package com.example.todoapp.model;
 
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "notes")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Note {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,6 +23,9 @@ public class Note {
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private User user;
+
+    @Transient
+    private Long userId;
 
     public Note() {
     }
@@ -59,6 +64,14 @@ public class Note {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public void addTodo(Todo todo) {

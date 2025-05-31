@@ -4,6 +4,7 @@ import com.example.todoapp.model.Note;
 import com.example.todoapp.model.Todo;
 import com.example.todoapp.repository.NoteRepository;
 import com.example.todoapp.repository.TodoRepository;
+import com.example.todoapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,13 +21,28 @@ public class NoteController {
     @Autowired
     private TodoRepository todoRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @GetMapping
     public List<Note> getAllNotes() {
         return noteRepository.findAll();
     }
 
+    @GetMapping("/user/{userId}")
+    public List<Note> getNotesByUserId(@PathVariable Long userId) {
+        return noteRepository.findByUser_Id(userId);
+    }
+
     @PostMapping
     public Note createNote(@RequestBody Note note) {
+        if (note.getUser() == null && note.getUserId() != null) {
+            userRepository.findById(note.getUserId())
+                .ifPresent(user -> {
+                    note.setUser(user);
+                    user.addNote(note);
+                });
+        }
         return noteRepository.save(note);
     }
 

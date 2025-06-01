@@ -1,9 +1,9 @@
 spring:
   datasource:
-    url: ${MYSQL_URL}?useSSL=true&serverTimezone=UTC&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:${MYSQL_URL}?useSSL=true&serverTimezone=UTC&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8
     username: ${MYSQL_USERNAME}
     password: ${MYSQL_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 5
       minimum-idle: 2
@@ -16,6 +16,10 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
 
   mvc:
     cors:
@@ -71,4 +75,10 @@ logging:
         web: INFO
         security: INFO
         boot:
-          autoconfigure: INFO 
+          autoconfigure: INFO
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
